@@ -2,17 +2,47 @@
 
 //--------------------------------------------------------------
 void ofApp::setup(){
-
+	// init fft all 0
+	fftSize = 128;
+	for (int i = 0; i < fftSize; i ++) {
+		fft.push_back(i * 1.1f);
+	}
+//	cout << &fft << endl;
+	rms = 0.0f;
+	sender.setup(HOST, PORT);
 }
 
 //--------------------------------------------------------------
 void ofApp::update(){
-
+	oscSendAudioData();
 }
 
 //--------------------------------------------------------------
 void ofApp::draw(){
 
+}
+//--------------------------------------------------------------
+void ofApp::exit(){
+	
+}
+//--------------------------------------------------------------
+void ofApp::oscSendAudioData(){
+	ofxOscBundle b;
+	ofxOscMessage m;
+	m.setAddress(FFT);
+	m.addIntArg(fftSize);
+	for(int i = 0;i < fftSize;i++){
+		m.addFloatArg(fft.at(i));
+	}
+	
+	b.addMessage(m);
+	m.clear();
+
+	m.setAddress(RMS);
+	m.addFloatArg(rms);
+	b.addMessage(m);
+
+	sender.sendBundle(b);
 }
 
 //--------------------------------------------------------------
