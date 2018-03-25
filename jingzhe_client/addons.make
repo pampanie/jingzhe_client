@@ -1,0 +1,13 @@
+ofxAudioAnalyzer
+ofxAudioDecoder
+ofxCv
+ofxFft
+ofxFlowTools
+ofxGui
+ofxKinect
+ofxKinectV2
+ofxMidi
+ofxNetwork
+ofxOpenCv
+ofxOsc
+ofxSyphon
