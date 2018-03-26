@@ -19,6 +19,9 @@
 
 #include "ofxSyphon.h"
 
+#include "ofxFft.h"
+#include "ofxAudioAnalyzer.h"
+#include "ofxAudioDecoder.h"
 
 using namespace cv;
 using namespace ofxCv;
@@ -46,19 +49,47 @@ public:
 	
 	
 	// audio ================
+	void					setupAudio();
+	ofSoundStream 			soundStream;
+	ofSoundStream			soundStreamUmc;
+	ofSoundStream			soundStreamSfUmc;
+	vector<ofSoundDevice>	deviceList;
+	
+	ofSoundBuffer			chennalBuffer;
+	
+	int sampleRate = 44100;
+	int bufferSize = 512;
+	
+	ofxFft* 				fft;
+	vector<float> 			fftBins;
+	float*					curFft;
+	
+	
+	void					audioIn(ofSoundBuffer &inBuffer);
+	ofxAudioAnalyzer 		audioAnalyzer;
+	ofSoundBuffer 			audioInSoundBuffer;
+	void 					myAudioAnalyze(ofSoundBuffer &soundBuffer);
+	
+	vector<float>		RMSs;
+	
+	
+	// osc ===================
+	void				setupOSC();
 	void 				oscSendAudioData();
 	ofxOscSender 		sender;
 	int					fftSize;
-	float				rms;
-	vector<float>		fft;
+	float				rmsData;
+	vector<float>		fftData;
 	
 	// midi out
+	void				setupMIDI();
 	void				midiSend();
 	ofxMidiOut 			midiOut;
 	int 				channel;
 	int 				note, velocity;
 	
 	// kinect kinect2=================
+	void				setupKinect();
 	void				updateKinect();
 	
 	ofxKinect 			kinect;
@@ -87,6 +118,7 @@ public:
 	
 	
 	// syphon out =======================
+	void				setupSyphon();
 	ofxSyphonServer 	mainOutputSyphonServer;
 	ofFbo				mainOutFbo;
 	ofFbo				animateFbo;
@@ -96,7 +128,7 @@ public:
 	
 	
 	// gui ===============================
-	
+	void				setupGUI();
 	
 	void keyPressed(int key);
 	void keyReleased(int key);

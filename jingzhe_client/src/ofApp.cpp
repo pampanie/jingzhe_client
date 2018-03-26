@@ -9,29 +9,16 @@ void ofApp::setup(){
 	ofSetVerticalSync(false);
 	
 	
-	
-	// init fft all 0 .............................................
-	fftSize = 128;
-	for (int i = 0; i < fftSize; i ++) {
-		fft.push_back(i * 1.1f);
-	}
-	//	cout << &fft << endl;
-	rms = 0.0f;
-	sender.setup(HOST, PORT);
-	
-	
-	// init midi .............................................
-	// print the available output ports to the console
-	midiOut.listPorts(); // via instance
-	//ofxMidiOut::listPorts(); // via static too
-	
-	// connect
-	midiOut.openPort(0); // by number
-	//midiOut.openPort("IAC Driver Pure Data In"); // by name
-	channel = 1;
-	note = 0;
-	velocity = 0;
-	
+	setupAudio();
+	setupOSC();
+	setupMIDI();
+	setupKinect();
+	setupSyphon();
+
+}
+//--------------------------------------------------------------
+
+void ofApp::setupKinect(){
 	// init kinect kinect2 .............................................
 	kinect.setRegistration(true);
 	kinect.init();
@@ -66,23 +53,73 @@ void ofApp::setup(){
 	
 	
 	
-	// syphon .............................................
+}
+//--------------------------------------------------------------
+
+void ofApp::setupMIDI(){
+	// init midi .............................................
+	// print the available output ports to the console
+	midiOut.listPorts(); // via instance
+	//ofxMidiOut::listPorts(); // via static too
+	
+	// connect
+	midiOut.openPort(0); // by number
+	//midiOut.openPort("IAC Driver Pure Data In"); // by name
+	channel = 1;
+	note = 0;
+	velocity = 0;
+}
+//--------------------------------------------------------------
+
+void ofApp::setupOSC(){
+	sender.setup(HOST, PORT);
+}
+//--------------------------------------------------------------
+
+void ofApp::setupAudio(){
+	// init audio
+	soundStream.printDeviceList();
+	
+	deviceList = soundStream.getDeviceList();
+	soundStream.setDeviceID(1);
+	
+	int inChennals = 2;
+	int outChennals = 0;
+	soundStream.setup(this, outChennals, inChennals, sampleRate, bufferSize, 8);
+	
+	fft = ofxFft::create(bufferSize, OF_FFT_WINDOW_HAMMING);
+	
+	
+	audioAnalyzer.setup(sampleRate, bufferSize, inChennals);
+	
+	chennalBuffer.allocate(bufferSize, 1);
 	
 	
 	
 	
+	// init fft all 0 .............................................
+	fftSize = 128;
+	for (int i = 0; i < fftSize; i ++) {
+		fftData.push_back(i * 1.1f);
+	}
+	//	cout << &fft << endl;
+	rmsData = 0.0f;
 	
 }
-
+//--------------------------------------------------------------
+void ofApp::setupSyphon(){
+	
+}
+//--------------------------------------------------------------
+void ofApp::setupGUI(){
+	
+}
 //--------------------------------------------------------------
 void ofApp::update(){
 	oscSendAudioData();
 	updateKinect();
-	
-	
-	
 }
-
+//--------------------------------------------------------------
 void ofApp::updateKinect(){
 	kinect.update();
 	
@@ -142,9 +179,91 @@ void ofApp::exit(){
 	kinect.setCameraTiltAngle(0); // zero the tilt on exit
 	kinect.close();
 	
+	// audio analyzer ================
+	audioAnalyzer.exit();
+	ofSoundStreamStop();
+	
+	
 	
 	
 }
+
+
+//--------------------------------------------------------------
+// could be heavy works on many sound input analyse
+void ofApp::myAudioAnalyze(ofSoundBuffer &soundBuffer){
+	
+	
+	soundBuffer.getChannel(chennalBuffer, 0);
+	
+	fft->setSignal(chennalBuffer.getBuffer().data());
+	
+	curFft = fft->getAmplitude();
+	
+	//
+	//	for(int i = 0; i < fftBins.size(); i++) {
+	//		cout << fftBins[i] << endl;
+	//	}
+	
+	//        cout << "----------- my audio analyzing -----------" << endl;
+	
+	//	fft->setSignal(chennalBuffer1.getBuffer().data());
+	//	float* curFft = fft->getAmplitude();
+	
+	
+	//	ofSoundBuffer tempSoundBuffer;
+	
+	//	for (int i = 0; i < UmcSfChannels; i++) {
+	//		tempSoundBuffer = soundBuffer.getChannel(tempSoundBuffer, i);
+	//		RMSs.at(i) = tempSoundBuffer.getRMSAmplitude();
+	
+	//		RMSs.at(i) = soundBuffer.getRMSAmplitudeChannel(i);
+	//	}
+	//
+	
+	
+	
+	//	float smoothing = 0.2;
+	//-:get Values:
+	//    rms     = audioAnalyzer.getValue(RMS, 0, smoothing);
+	//	power   = audioAnalyzer.getValue(POWER, 0, smoothing);
+	//    pitchFreq = audioAnalyzer.getValue(PITCH_FREQ, 0, smoothing);
+	//    pitchConf = audioAnalyzer.getValue(PITCH_CONFIDENCE, 0, smoothing);
+	//    pitchSalience  = audioAnalyzer.getValue(PITCH_SALIENCE, 0, smoothing);
+	//    inharmonicity   = audioAnalyzer.getValue(INHARMONICITY, 0, smoothing);
+	//    hfc = audioAnalyzer.getValue(HFC, 0, smoothing);
+	//    specComp = audioAnalyzer.getValue(SPECTRAL_COMPLEXITY, 0, smoothing);
+	//    centroid = audioAnalyzer.getValue(CENTROID, 0, smoothing);
+	//    rollOff = audioAnalyzer.getValue(ROLL_OFF, 0, smoothing);
+	//    oddToEven = audioAnalyzer.getValue(ODD_TO_EVEN, 0, smoothing);
+	//    strongPeak = audioAnalyzer.getValue(STRONG_PEAK, 0, smoothing);
+	//    strongDecay = audioAnalyzer.getValue(STRONG_DECAY, 0, smoothing);
+	//    //Normalized values for graphic meters:
+	//    pitchFreqNorm   = audioAnalyzer.getValue(PITCH_FREQ, 0, smoothing, TRUE);
+	//    hfcNorm     = audioAnalyzer.getValue(HFC, 0, smoothing, TRUE);
+	//    specCompNorm = audioAnalyzer.getValue(SPECTRAL_COMPLEXITY, 0, smoothing, TRUE);
+	//    centroidNorm = audioAnalyzer.getValue(CENTROID, 0, smoothing, TRUE);
+	//    rollOffNorm  = audioAnalyzer.getValue(ROLL_OFF, 0, smoothing, TRUE);
+	//    oddToEvenNorm   = audioAnalyzer.getValue(ODD_TO_EVEN, 0, smoothing, TRUE);
+	//    strongPeakNorm  = audioAnalyzer.getValue(STRONG_PEAK, 0, smoothing, TRUE);
+	//    strongDecayNorm = audioAnalyzer.getValue(STRONG_DECAY, 0, smoothing, TRUE);
+	//
+	//    dissonance = audioAnalyzer.getValue(DISSONANCE, 0, smoothing);
+	//
+	//	spectrum = audioAnalyzer.getValues(SPECTRUM, 0, smoothing);
+	//    melBands = audioAnalyzer.getValues(MEL_BANDS, 0, smoothing);
+	//    mfcc = audioAnalyzer.getValues(MFCC, 0, smoothing);
+	//    hpcp = audioAnalyzer.getValues(HPCP, 0, smoothing);
+	//
+	//    tristimulus = audioAnalyzer.getValues(TRISTIMULUS, 0, smoothing);
+	//
+	//    isOnset = audioAnalyzer.getOnsetValue(0);
+	//
+	
+}
+
+
+
 //--------------------------------------------------------------
 void ofApp::midiSend(){
 	int key = 69;// for test only
@@ -163,19 +282,29 @@ void ofApp::oscSendAudioData(){
 	m.setAddress(FFT);
 	m.addIntArg(fftSize);
 	for(int i = 0;i < fftSize;i++){
-		m.addFloatArg(fft.at(i));
+		m.addFloatArg(fftData.at(i));
 	}
 	
 	b.addMessage(m);
 	m.clear();
 	
 	m.setAddress(RMS);
-	m.addFloatArg(rms);
+	m.addFloatArg(rmsData);
 	b.addMessage(m);
 	
 	sender.sendBundle(b);
 }
 
+//--------------------------------------------------------------
+
+void ofApp::audioIn(ofSoundBuffer &inBuffer){
+	//	cout << inBuffer.getDeviceID() << endl;
+	
+	
+	
+	audioInSoundBuffer = inBuffer;
+	
+}
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key){
 	
