@@ -84,7 +84,8 @@ void ofApp::setupAudio(){
 	soundStream.printDeviceList();
 	
 	deviceList = soundStream.getDeviceList();
-	soundStream.setDeviceID(1);
+	// use build-in mic to test
+	soundStream.setDeviceID(0);
 	
 	int inChennals = 2;
 	int outChennals = 0;
@@ -154,6 +155,7 @@ void ofApp::setupGUI(){
 }
 //--------------------------------------------------------------
 void ofApp::update(){
+	myAudioAnalyze(audioInSoundBuffer);
 	oscSendAudioData();
 	updateKinect();
 	updateSyphon();
@@ -362,6 +364,13 @@ void ofApp::myAudioAnalyze(ofSoundBuffer &soundBuffer){
 	fft->setSignal(chennalBuffer.getBuffer().data());
 	
 	curFft = fft->getAmplitude();
+	
+	for(int i = 0;i < fft->getBinSize() - 1;i++){
+		fftData.at(i) = curFft[i] * 1000;
+	}
+	
+	rmsData = chennalBuffer.getRMSAmplitude();
+	
 	
 	//
 	//	for(int i = 0; i < fftBins.size(); i++) {

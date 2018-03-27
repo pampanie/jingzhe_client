@@ -58,7 +58,7 @@ public:
 	ofSoundBuffer			chennalBuffer;
 	
 	int sampleRate = 44100;
-	int bufferSize = 512;
+	int bufferSize = 256;
 	
 	ofxFft* 				fft;
 	vector<float> 			fftBins;
@@ -70,7 +70,7 @@ public:
 	ofSoundBuffer 			audioInSoundBuffer;
 	void 					myAudioAnalyze(ofSoundBuffer &soundBuffer);
 	
-	vector<float>		RMSs;
+//	vector<float>		RMSs;
 	
 	
 	// osc ===================
