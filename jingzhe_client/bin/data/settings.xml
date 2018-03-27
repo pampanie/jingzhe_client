@@ -1,0 +1,11 @@
+<group>
+	<thresh_with_opencv>0</thresh_with_opencv>
+	<kinect1_near>197</kinect1_near>
+	<kinect1_far>107</kinect1_far>
+	<kinect1_angle>39</kinect1_angle>
+	<kinect2_near>7574</kinect2_near>
+	<kinect2_far>1516</kinect2_far>
+	<kinect2_gray_near>54</kinect2_gray_near>
+	<kinect2_gray_far>40</kinect2_gray_far>
+<group/>
+</group>

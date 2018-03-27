@@ -91,26 +91,56 @@ public:
 	// kinect kinect2=================
 	void				setupKinect();
 	void				updateKinect();
+	void				drawKinect();
 	
-	ofxKinect 			kinect;
+	ofxKinect 			kinect1;
 	ofxKinectV2			kinect2;
 	
-	bool 				bThreshWithOpenCV;
-	bool 				bDrawPointCloud;
+	ofParameter<bool> 	bThreshWithOpenCV;
+//	bool 				bDrawPointCloud;
 	
-	int 				nearThreshold;
-	int 				farThreshold;
-	
-	int 				angle;
-	
+	ofParameter<int>  	k1Angle;
+	ofParameter<int>  	k2Angle;
+
 	ofxCvColorImage 	colorImg;
-	
 	ofxCvGrayscaleImage grayImage; // grayscale depth image
 	ofxCvGrayscaleImage grayThreshNear; // the near thresholded image
 	ofxCvGrayscaleImage grayThreshFar; // the far thresholded image
 	
 	ofxCvContourFinder 	contourFinder;
 	
+	// ------- for multi kinect2
+//	ofxPanel 			kinect2Panel;
+//
+//	vector < shared_ptr<ofxKinectV2> > kinects;
+//
+//	vector <ofTexture> 	texDepth;
+//	vector <ofTexture> 	texRGB;
+	
+	
+	ofTexture			k1TexDepth;
+	
+	ofTexture			k2TexDepth;
+//	ofTexture			k2TexRGB;
+	
+	ofParameter<int>	k1GrayThreshNear;
+	ofParameter<int>	k1GrayThreshFar;
+	
+	ofParameter<int>	k2Near;
+	ofParameter<int>	k2Far;
+	ofParameter<int>	k2GrayThreshNear;
+	ofParameter<int>	k2GrayThreshFar;
+
+	ofParameter<int>	minAreaContour;
+	ofParameter<int>	maxAreaContour;
+	ofParameter<int>    contourConsidered;
+	ofParameter<bool>	bContourFindHole;
+	
+	
+	// contour of kinect2
+	vector<float>			contourBlobAreas;
+	vector<ofRectangle>		contourBoundingBoxes;
+	vector<ofPoint>			contourBlobCentroids;
 	// fluid particle =============================
 	MyFlowTools			myFlowTools;
 	ofFbo				fboForFluid;
@@ -119,16 +149,26 @@ public:
 	
 	// syphon out =======================
 	void				setupSyphon();
-	ofxSyphonServer 	mainOutputSyphonServer;
-	ofFbo				mainOutFbo;
+	void				updateSyphon();
+	ofxSyphonServer 	k1OutputSyphonServer;
+	ofxSyphonServer 	k2OutputSyphonServer;
+	ofxSyphonServer 	animateOutputSyphonServer;
+	ofxSyphonServer 	videoOutputSyphonServer;
+	
 	ofFbo				animateFbo;
-	ofFbo				kinectFbo;
+	ofFbo				kinect1Fbo;
+	ofFbo				kinect2Fbo;
 	ofFbo				videoFbo;
 	
 	
 	
 	// gui ===============================
 	void				setupGUI();
+	void 				drawGui();
+
+	ofxPanel			gui;
+	
+	
 	
 	void keyPressed(int key);
 	void keyReleased(int key);
